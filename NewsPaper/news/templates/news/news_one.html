@@ -1,0 +1,24 @@
+{% extends 'layer/base.html' %}
+ 
+{% block title %}
+{{ post.titel|truncatechars:40 }}
+{% endblock title %}
+ 
+{% block content %}
+<h1>НОВОСТИ</h1> 
+
+{% if post %} 
+    <h2>{{ post.titel }}</h3> 
+    <i>Дата публикации {{ post.dataCreation|date:'d M Y' }}
+        {{ post.dataCreation|time:'H: i' }}
+
+    </i>
+    <hr>
+    {{ post.text}}
+
+
+{% else %}
+    <h1>'Такой новости нет'</h1> 
+{% endif %}
+
+{% endblock content %}

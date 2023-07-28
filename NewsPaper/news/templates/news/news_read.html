@@ -1,0 +1,25 @@
+{% extends 'layer/base.html' %}
+{% load censored_filters %}
+ 
+{% block title %}
+Новостной портал, добро пожаловать!
+{% endblock title %}
+ 
+{% block content %}
+<h1>НОВОСТИ</h1> 
+<hr>
+
+{% if posts %} 
+    {% for post in posts %} 
+
+    <h2>{{ post.titel|censor }}</h2> 
+    <i>Дата публикации {{ post.dataCreation|date:'d M Y'  }}</i>
+    <p>{{ post.text|truncatewords:50|censor  }}</p>
+    <hr>
+    {% endfor %}
+
+{% else %}
+    <h1>'Такой новости нет'</h1> 
+{% endif %}
+
+{% endblock content %}

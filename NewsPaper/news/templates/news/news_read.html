@@ -6,15 +6,14 @@
 {% endblock title %}
  
 {% block content %}
-<h1>НОВОСТИ</h1> 
 <hr>
 
 {% if posts %} 
     {% for post in posts %} 
-
     <h2>{{ post.titel|censor }}</h2> 
     <i>Дата публикации {{ post.dataCreation|date:'d M Y'  }}</i>
     <p>{{ post.text|truncatewords:50|censor  }}</p>
+    <i>раздел "{{ post.postCategory.name }}", понравилось: {{ post.rating }} человек, автор {{post.author.autorUser.username }}, {{ post.author.ratingAuthor }} ,баллов</i>
     <hr>
     {% endfor %}
 

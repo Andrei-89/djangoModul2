@@ -1,38 +1,80 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
+from django.views import View
+from django_filters import FilterSet
 from .models import *
 from django.utils import timezone
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from .filters import PostFilter 
  
  
 class PostList(ListView):
+    model = Post
+    template_name = 'news/news_filter.html' 
+    context_object_name = 'posts' 
+    queryset = Post.objects.all().order_by('-dataCreation')
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+       context = super().get_context_data(**kwargs)
+       context['time_now'] = timezone.localtime(timezone.now()) # добавим переменную текущей даты time_now
+       context['value1'] = Post.objects.filter(categoryType = 'NW') # добавим ещё одну пустую переменную, чтобы на её примере посмотреть работу другого фильтра
+       context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+      
+       return context
+    
+
+class PostAllView(ListView):
     model = Post
     template_name = 'news/news_all.html' 
     context_object_name = 'posts' 
     queryset = Post.objects.all().order_by('-dataCreation')
 
     def get_context_data(self, **kwargs):
-       context = super().get_context_data(**kwargs)
-       context['time_now'] = timezone.localtime(timezone.now()) # добавим переменную текущей даты time_now
-       context['value1'] = Post.objects.filter(categoryType = 'NW') # добавим ещё одну пустую переменную, чтобы на её примере посмотреть работу другого фильтра
-       return context
-    
+        context = super().get_context_data(**kwargs)
+        context['time_now'] = timezone.localtime(timezone.now()) # добавим переменную текущей даты time_now
+        context['value1'] = Post.objects.filter(categoryType = 'NW') # добавим ещё одну пустую переменную, чтобы на её примере посмотреть работу другого фильтра
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
 
+        return context
+
+    
 class PostDetail(DetailView):
     model = Post
     template_name = 'news/news_one.html' 
     context_object_name = 'post' 
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['object'] = self.__str__()
-        return context
     
 class CensoredList(ListView):
     model = Post
     template_name = 'news/news_read.html' 
-    context_object_name = 'posts' 
+    context_object_name = 'posts'
     queryset = Post.objects.all().order_by('-dataCreation')
+
+class News(View):
+   def get(self, request):
+       posts = Post.objects.all().order_by('-dataCreation')
+       p = Paginator(posts, 2)
+       posts = p.get_page(request.GET.get('page', 2))
+       data = {
+       'posts': posts,
+       }
+
+       return render(request, 'news/news_filter.html', data)
+
+class PostFilter(FilterSet):
+    class Meta:
+       model = Post
+       template_name = 'news/news_filter.html' 
+       fields = {
+           'dataCreation': ['gt'],
+           'categoryType': ['exact'],
+           'author': ['exact'],
+           'titel': ['icontains'],
+        }
+
+#
 
         
     # def index(request):

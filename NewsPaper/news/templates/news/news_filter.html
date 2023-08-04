@@ -1,0 +1,67 @@
+{% extends 'layer/base.html' %}
+ 
+{% block title %}
+Новости
+{% endblock title %}
+ 
+{% block content %}
+<p>время {{ time_now|time:"H:i" }}</p>
+<p>текущая дата {{ time_now|date:"d.m.Y" }} г</з>
+<p>Найдено количество постов: {{ posts|length }}, из них  новостей: {{ value1|length|default_if_none:"ничего" }}</p>
+
+<h1>НОВОСТИ</h1> 
+    <hr>
+    {% if posts %} 
+    <form method="GET">
+        {{ filter.form }}
+        <!-- Форму от фильтров за нас сделает Django. А вот кнопку, увы, придётся делать самим -->
+        <input class="btn btn-primary" type="submit" value="Найти">
+     </form>
+        <table class="table">
+            <tr>
+                <th scope="col">
+                    Автор
+                </th>
+                <th scope="col">
+                    Категория
+                </th>
+                <th scope="col">
+                    Дата публикации
+                </th>
+                <th scope="col">
+                    Заголовок
+                </th>
+                <th scope="col">
+                    Краткое содержание
+                </th>
+        
+            </tr>
+
+        {% for post in filter.qs %} <!-- Для каждого товара будет генерироваться новая строчка, т. е. новый HTML-код. При этом сам цикл работает точно так же, как и в python. product -- переменная цикла, т. е. наш товар, взятый из общего списка -->
+            <tr>
+                <td>
+                    {{ post.author.autorUser }} <!-- Не забываем, что переменные в шаблоне ничем не отличаются от переменных в Python. Здесь также можно получать доступ к полям класса. Например, здесь мы выводим имя, в следующем столбце описание и т.д.  -->
+                </td>
+                <td>
+                    {{ post.get_categoryType_display }}
+                </td>
+                <td>
+                    {{ post.dataCreation|date:'d M Y'  }}
+                </td>
+                <td>
+                    {{ post.titel }}
+                </td>
+                <td>
+                    {{  post.text|truncatewords:20 }}
+                </td>
+
+            </tr>
+        {% endfor %}
+        </table>
+        {% include 'layer/parts/paginator.html' %}
+
+    {% else %}
+        <h2>Новостей нет!</h2>
+    {% endif %}
+
+{% endblock content %}

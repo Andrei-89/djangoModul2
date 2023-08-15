@@ -100,7 +100,8 @@ class PostCreateView(CreateView):
 class PostUpdateView(UpdateView):
     template_name = 'news/post_create.html'
     form_class = PostForm
-    success_url = './card' 
+    
+    success_url = reverse_lazy('news:posts')
 
 
     # метод get_object мы используем вместо queryset, чтобы получить информацию об объекте который мы собираемся редактировать

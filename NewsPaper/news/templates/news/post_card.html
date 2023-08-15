@@ -1,0 +1,24 @@
+{% extends 'layer/base.html' %} 
+{% block title %} 
+  Карточка новости 
+{% endblock title %} 
+
+{% block content %}
+
+<h3>Новость добавленна</h3>
+<div class="card">
+  <div class="card-header">
+    <h3>{{ post.titel }}</h3>
+    <div>
+      Автор: <span class="badge bg-info">{{ post.author.autorUser }}</span> Type:
+      <span class="badge bg-info">{{ post.get_categoryType_display }}</span>
+    </div>
+  </div>
+  <div class="card-body">{{ post.dataCreation|date:'d M Y' }}</div>
+  <div class="card-body">{{ post.text|truncatewords:20 }}</div>
+</div>
+
+<a href="{% url 'news:posts' %}"class="btn btn-primary" type="submit">Далее </a>
+
+
+{% endblock content %}

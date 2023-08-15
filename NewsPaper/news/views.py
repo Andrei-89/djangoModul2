@@ -100,7 +100,7 @@ class PostCreateView(CreateView):
 class PostUpdateView(UpdateView):
     template_name = 'news/post_create.html'
     form_class = PostForm
-    success_url = reverse_lazy('news:posts')
+    success_url = './card' 
 
 
     # метод get_object мы используем вместо queryset, чтобы получить информацию об объекте который мы собираемся редактировать
@@ -115,6 +115,10 @@ class PostDeleteView(DeleteView):
     # переход на страницу поиска новостей
     success_url = reverse_lazy('news:posts') # не забываем импортировать функцию reverse_lazy из пакета django.urls
 
+
+class PostCard(DetailView):
+    model = Post
+    template_name = 'news/post_card.html' 
 
 #
 

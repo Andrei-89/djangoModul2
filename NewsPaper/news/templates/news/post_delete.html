@@ -1,0 +1,27 @@
+{% extends 'layer/base.html' %} 
+{% block title %} 
+  Удаление новости 
+{% endblock title %} 
+
+{% block content %}
+
+<h3>Delete this post?</h3>
+<div class="card">
+  <div class="card-header">
+    <h3>{{ post.titel }}</h3>
+    <div>
+      Автор: <span class="badge bg-info">{{ post.author.autorUser }}</span> Type:
+      <span class="badge bg-info">{{ post.get_categoryType_display }}</span>
+    </div>
+  </div>
+  <div class="card-body">{{ post.dataCreation|date:'d M Y' }}</div>
+  <div class="card-body">{{ post.text|truncatewords:20 }}</div>
+</div>
+
+
+<form method="POST">
+  {% csrf_token %}
+  <input class="btn btn-danger my-3" type="submit" value="Удалить" />
+</form>
+
+{% endblock content %}

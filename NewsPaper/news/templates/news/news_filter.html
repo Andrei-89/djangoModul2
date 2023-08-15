@@ -17,6 +17,12 @@
         <!-- Форму от фильтров за нас сделает Django. А вот кнопку, увы, придётся делать самим -->
         <input class="btn btn-primary" type="submit" value="Найти">
      </form>
+     
+    <p></p>
+     <a href="{% url 'news:post_create' %}"class="btn btn-primary" type="submit">Добавить новость </a>
+
+
+
         <table class="table">
             <tr>
                 <th scope="col">
@@ -33,6 +39,9 @@
                 </th>
                 <th scope="col">
                     Краткое содержание
+                </th>
+                <th scope="col">
+                    Действия
                 </th>
         
             </tr>
@@ -54,6 +63,14 @@
                 <td>
                     {{  post.text|truncatewords:20 }}
                 </td>
+                <td>
+                    <a href="{% url 'news:post_update' post.id %}">
+                        Update
+                    </a>
+                    <a href="{% url 'news:post_delete' post.id %}">
+                        Delete
+                    </a>
+                </td>
 
             </tr>
         {% endfor %}
@@ -63,5 +80,18 @@
     {% else %}
         <h2>Новостей нет!</h2>
     {% endif %}
+
+    <!-- <form method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <input class="btn btn-success" type="submit" value="Добавить">
+     </form> -->
+
+     <form method='POST'>
+        {% csrf_token %}
+        <!-- {{ form_test.as_p }}    -->
+        {{form_test}} 
+    </form>
+
 
 {% endblock content %}

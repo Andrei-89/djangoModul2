@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.views import View
@@ -8,6 +9,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 from .filters import PostFilter 
 from .models import *
 from .forms import *
@@ -92,12 +95,13 @@ class PostFilter(FilterSet):
         }
 
 # дженерик для создания объекта. Надо указать только имя шаблона и класс формы, который мы написали в прошлом юните. Остальное он сделает за вас
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     template_name = 'news/post_create.html'
     form_class = PostForm
     
 # дженерик для редактирования объекта
-class PostUpdateView(UpdateView):
+@method_decorator(login_required, name='dispatch')
+class PostUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'news/post_create.html'
     form_class = PostForm
     
@@ -110,7 +114,7 @@ class PostUpdateView(UpdateView):
         return Post.objects.get(pk=id)
 
 # дженерик для удаления товара
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'news/post_delete.html'
     queryset = Post.objects.all()
     # переход на страницу поиска новостей

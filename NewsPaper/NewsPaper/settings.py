@@ -47,6 +47,8 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+LOGIN_URL = 'news/search/'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,6 +62,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
+
+LOGIN_URL = '/news/'
 
 TEMPLATES = [
     {

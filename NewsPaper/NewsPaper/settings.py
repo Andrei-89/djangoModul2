@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-llo4n2#8*$-e_^3$&40tm40b+0#-2$24o+ub5pvd_(^&e2=7(l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -39,15 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django.contrib.flatpages',
     'django_filters',
+
+    'allauth',
+    'allauth.account',
     
     'news',
 ]
 
 SITE_ID = 1
 
-LOGIN_URL = 'news/search/'
+LOGIN_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,18 +59,20 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
 
-LOGIN_URL = '/news/'
+LOGIN_URL = '/login/'
+
+ACCOUNT_FORMS = {'signup': 'sign.forms.BasicSignupForm'}
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates').replace('\\', '/'), 
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

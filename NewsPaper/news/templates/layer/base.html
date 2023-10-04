@@ -13,7 +13,12 @@
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     </head>
     <body>
+        <!-- {% load cache %} -->
+        <!-- {% cache 30 header %}
+        {% block header %} -->
         {% include './parts/header.html' %}
+        <!-- {% endblock header %}
+        {% endcache %} -->
         <div class="container">
             {% block content %}
             {% endblock content %}

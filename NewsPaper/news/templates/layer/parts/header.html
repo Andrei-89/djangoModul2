@@ -13,8 +13,14 @@
         </ul>
        
         <div class="text-end">
+          {% if request.user.username %}
+          <a type="button" class="btn btn-warning" href="/user/">
+            {{request.user.username}}
+          </a>
+            {% else %}
           <a type="button" class="btn btn-outline-light me-2" href="/login/">Login</a>
-          <a type="button" class="btn btn-warning" href="/signup/">Sign-up</a>
+          <a type="button" class="btn btn-warning" href="/accounts/signup/">Sign-up</a>
+          {% endif %}
         </div>
       </div>
     </div>

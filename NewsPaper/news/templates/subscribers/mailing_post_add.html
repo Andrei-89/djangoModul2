@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ posts }}</title>
+</head>
+<body>
+    <p>Здравствуй, {{ username }}. Новая статья в твоём любимом разделе!</p>
+    <hr>
+    {% for post in posts %}
+        <h2>{{ post.titel }}</h2>
+        <p>{{ post.text|truncatechars:50  }}</p>     
+        <a href="http://127.0.0.1:8006{% url 'news:post' post.id %}">Читать полностью</a>      
+        <hr>
+    {% endfor %}
+</body>
+</html>

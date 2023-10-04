@@ -1,0 +1,17 @@
+{% extends 'layer/base.html' %} 
+{% block title %} 
+  Подписки
+{% endblock title %} 
+
+{% block content %}
+
+<h1>Подписаться на новости</h1>
+
+<form action="{% url 'news:subscribers' %}" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+{{ form }}
+<input class="btn btn-success my-3" type="submit" value="Подписаться на эту категорию" />
+</form>
+
+
+{% endblock content %}

@@ -78,6 +78,34 @@ class PostForm(ModelForm):
          }),
        }
 
+class SubscribersForm(ModelForm):
+    class Meta:
+       model = Mailing
+       fields = ['category', 'subscribers']
+      
+       widgets = {
+         'category' : forms.Select(attrs={
+           'class': 'form-select',
+         }),
+       }
+    def __init__(self, *args, **kwargs):
+        super(SubscribersForm, self).__init__(*args, **kwargs)
+        self.fields['category'].label_from_instance = lambda obj: obj.name
+        
+# class SubscribersForm(forms.ModelForm):
+#     class Meta:
+#         model = Mailing
+#         fields = '__all__'
+#         widgets = {
+#             'category': forms.CheckboxSelectMultiple
+#         }
+#     def __init__(self, *args, **kwargs):
+#         super(SubscribersForm, self).__init__(*args, **kwargs)
+#         self.fields['category'].label_from_instance = lambda obj: obj.name
+        
+  
+    
+
 # class PostTestForm(forms.Form):
 #     # author = forms.ModelChoiceField(queryset=Author.objects.all())
 #     categoryType = forms.Select()

@@ -6,7 +6,7 @@
  
 {% block content %}
 <h1>НОВОСТИ</h1> 
-
+<p>время {{ time_now|time:"H:i" }}</p>
 {% if post %} 
     <h2>{{ post.titel }}</h3> 
     <i>Дата публикации {{ post.dataCreation|date:'d M Y' }}

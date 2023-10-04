@@ -25,13 +25,122 @@ from .filters import PostFilter
 from django.shortcuts import redirect 
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+
 
 from .models import *
 from .forms import *
 
+# Отправляем форму о том что он успешно подписался на категорию
+class SubscribersView(CreateView):
+    model = Mailing
+    template_name = 'subscribers/make_subscribers.html'
+    form_class = SubscribersForm
+    success_url = '/news/'
+
+    # def get(self, request, *args, **kwargs):
+    #     form = self.form_class()
+    #     print(form)
+
+    def subscribe_add(self, request):
+        categorys = request.POST.getlist('name')
+        user = self.user.username
+        for category in categorys:
+            subscriber = Mailing(categorys=category, subscriber=user)
+            subscriber.save()
+
+
+# class SubscribersForm(ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         self.authorized_user = kwargs.pop('authorized_user', None)
+#         super(SubscribersForm, self).__init__(*args, **kwargs)
+        
+#         if self.authorized_user:
+#             self.fields['subscribers'].initial = self.authorized_user
+    
+#     class Meta:
+#         model = Mailing
+#         fields = ['category', 'subscribers']
+#         widgets = {
+#             'category': forms.Select(attrs={'class': 'form-select'}),
+#         }
+
+
+    # def form_valid(self, form):
+    #     subscribe = form.save()
+    #     print (subscribe)
+        # user = Group.objects.get_or_create(name='common')[0]
+        # subscribe.groups.add(user) # добавляем нового пользователя в эту группу
+        # subscribe.save()
+        # return super().form_valid(form)
+
+
+
+    # def get(self, request, *args, **kwargs):
+    #     form = self.form_class()
+    #     return render(request, self.template_name, {'form': form})
+
+    #В этом коде мы создаем экземпляр формы SubscribersForm с данными из запроса request.POST. Затем мы проверяем, является ли форма валидной. Если форма валидна, мы сохраняем экземпляр модели Subscriber, устанавливаем поле userThrough равным экземпляру пользователя request.user и сохраняем модель.
+   
+    # def post(self, request, *args, **kwargs):
+    #     category_names = request.POST.getlist('category')
+    #     for category in category_names:
+    #         form = CategorySubscriber(category=category, user=request.user,)
+    #         if form.is_valid():
+    #             form.save()
+    #     return redirect('news:user')
+
+        #Если форма не валидна, мы возвращаем шаблон с формой и ошибками.
+        # return render(request, self.template_name, {'form': form})
+        
+
+        # form = Subscriber(
+	    # userThrough=request.user.username,
+        # categoryThrough=request.POST['categoryThrough'],
+        # )
+        # if form.is_valid():
+        #     form.save()
+        # return redirect('news:user')
+    
+     # def get(request):
+    #     if request.method == 'POST':
+    #         form = SubscribersForm(request.POST)
+    #         if form.is_valid():
+    #             subscriber = form.save(commit=False)
+    #             subscriber.user = request.user
+    #             subscriber.save()
+
+    #             # Проверяем наличие email у пользователя
+    #             if request.user.email:
+    #                 # Отправляем сообщение на email пользователя
+    #                 # Ваш код отправки сообщения
+
+    #                 return redirect('news:user')  # Перенаправляем на страницу успешной подписки
+    #     else:
+    #         form = SubscribersForm()
+
+    #     return render(request, 'subscribe.html', {'form': form})
+
+    # def send_newsletter(category):
+    #     subscribers = category.subscribers.filter(id=user.id).exists()
+    #     for subscriber in subscribers:
+    #         subject = f'{category.subscribers} - Вы подписаны на новостную категорию {category.name}',
+    #         message = 'Поздравляю!',
+    #         from_email = 'bulanov-rvp@yandex.ru',
+    #         # заменить на почту пользователя
+    #         recipient_list = ['bylich07@mail.ru'],
+    #         html_message = render_to_string('newsletter.html', {'category': category, 'subscriber': subscriber}),
+    #         send_mail(subject, message, from_email, recipient_list, html_message=html_message),
+    #     return redirect('news:user')
+
+
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
+    
     template_name = 'sign/user.html'
     
     def get_context_data(self, **kwargs):
@@ -50,7 +159,7 @@ def upgrade_me(request):
 
 class RegisterView(CreateView):
    model = User
-   form_class = RegisterForm
+   form_class = RegisterForm 
    template_name = 'sign/signup.html'
    success_url = '/news/search/'
 
@@ -133,6 +242,19 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'news/news_one.html' 
     context_object_name = 'post' 
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+        if not obj:
+            obj = super().get_object(queryset=self.queryset) 
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+        return obj
+    
+    def get_context_data(self, **kwargs):
+       context = super().get_context_data(**kwargs)
+       context['time_now'] = timezone.localtime(timezone.now())
+       return context
+
     
 class CensoredList(ListView):
     model = Post
@@ -167,6 +289,15 @@ class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'news/post_create.html'
     form_class = PostForm
     permission_required = ('news.add_post', 'news.change_post')
+    success_url = reverse_lazy('news:posts')
+    # При выходе новости отправляем новость тем читателям,которые подписались (как функцию при добавлении статьи)
+    
+    # def send_newsletter(category):
+    #     subscribers = category.subscribers.filter(кто подписался)
+    #     for subscriber in subscribers:
+    #         subject = category.name
+    #         message = render_to_string('newsletter.html', {'category': category, 'subscriber': subscriber})
+    #         send_mail(subject, '', 'noreply@example.com', [subscriber.email], html_message=message)
     
 # дженерик для редактирования объекта
 

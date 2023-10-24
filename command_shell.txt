@@ -1,0 +1,91 @@
+Задание
+1. Создать двух пользователей (с помощью метода User.objects.create_user).
+2. Создать два объекта модели Author, связанные с пользователями.
+3. Добавить 4 категории в модель Category.
+4. Добавить 2 статьи и 1 новость.
+5. Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+6. 
+7. Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+8. Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+9. Обновить рейтинги пользователей.
+10. Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+11. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+12. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
+(venv) andremac@MBP-Andrej djangoModul2 % cd NewsPaper
+ python3 manage.py shell
+from news.models import *
+
+# Создаем первого пользователя
+user1 = User.objects.create_user(username='user1', password='password1')
+author1 = Author.objects.create(autorUser=user1)
+
+# Создаем второго пользователя 
+user2 = User.objects.create_user(username='user2', password='password2')
+author2 = Author.objects.create(autorUser=user2)
+Category.objects.create(name='World')
+Category.objects.create(name='Different')
+Category.objects.create(name='IT')
+Category.objects.create(name='Villadge')
+
+# Создаем  статью
+Post.objects.create(author=Author.objects.get(autorUser='user1'), categoryType='AR', titel='Article 1', text='Text 1') 
+
+# Создаем новость 
+Post.objects.create(author=Author.objects.get(autorUser='user2'), categoryType='NW', titel='News 1', text='Text 2') 
+
+p1 = Post.objects.get(pk=1)
+p2 = Post.objects.get(pk=2)
+p3 = Post.objects.get(pk=3)
+p4 = Post.objects.get(pk=4)
+c1 = Category.objects.get(name='IT')
+c2 = Category.objects.get(name='Education')
+c3 = Category.objects.get(name='Different')
+c4 = Category.objects.get(name='New')
+p1.postCategory.add(c1)
+p2.postCategory.add(c1, c2, c3, c4)
+p3.postCategory.add(c3, c2)
+p4.postCategory.add(c4)
+
+# Создать четыре комментария к разным объектам модели Post:
+comment1 = Comment.objects.create(commentPost=article1, commentUser=user2, text='Comment 1')
+comment2 = Comment.objects.create(commentPost=news1, commentUser=user1, text='Comment 2')
+comment3 = Comment.objects.create(commentPost=article1, commentUser=user2, text='Comment 3')
+comment4 = Comment.objects.create(commentPost=article1, commentUser=user1, text='Comment 4')
+# Применить функции like() и dislike() к статьям, новостям и комментариям:
+# Post.objects.get(pk=1).like()
+# Post.objects.get(pk=1).like()
+# Post.objects.get(pk=1).like()
+# Post.objects.get(pk=1).like()
+# Post.objects.get(pk=2).like()
+# Post.objects.get(pk=2).like()
+# Post.objects.get(pk=2).like()
+# Post.objects.get(pk=2).like()
+# Post.objects.get(pk=3).like()
+# Post.objects.get(pk=3).like()
+# Post.objects.get(pk=4).dislike()
+# Post.objects.get(pk=2).dislike()
+# Post.objects.get(pk=1).dislike()
+# Comment.objects.get(pk=1).like()
+# Comment.objects.get(pk=1).like()
+# Comment.objects.get(pk=1).dislike()
+# Comment.objects.get(pk=2).like()
+# Comment.objects.get(pk=2).like()
+# Comment.objects.get(pk=2).like()
+# Comment.objects.get(pk=2).dislike()
+# Comment.objects.get(pk=3).like()
+
+# Обновление рейтингов пользователей
+Author.objects.get(autorUser=User.objects.get(username="user1")).apdate_rating() 
+Author.objects.get(autorUser=User.objects.get(username="user2")).apdate_rating() 
+
+#Вывести username и рейтинг лучшего пользователя:
+best_author = Author.objects.order_by('-ratingAuthor').first() print(f'Username: {best_author.autorUser.username}, Rating: {best_author.ratingAuthor}') 
+#Вывести информацию о лучшей статье (основываясь на лайках и дислайках) и ее комментариях:
+best_article = Post.objects.filter(categoryType=Post.ARTICLE).order_by('-rating').first() 
+print(f'Date: {best_article.dataCreation}, Author: {best_article.author.autorUser.username}, Rating: {best_article.rating}, Title: {best_article.titel}, Preview: {best_article.preview()}') 
+
+comments = Comment.objects.filter(commentPost=best_article) 
+for comment in comments: 
+print(f'Date: {comment.dataCreation}, User: {comment.commentUser.username}, Rating: {comment.rating}, Text: {comment.text}') 
+

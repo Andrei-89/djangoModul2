@@ -29,13 +29,17 @@ class Author(models.Model):
     ratingAuthor = models.SmallIntegerField(default=0)
 
     def apdate_rating(self):
-        postRat = self.post_set.all().aggregate(postRating=Sum('rating')) #Получаем все наши посты автора агригатором работаем с множеством записей и суммируем все поля значений rating
+        postRat = self.post_set.all().aggregate(postRating=Sum('rating'))
         pRat = 0
-        pRat += postRat.get('postRating')
 
-        commentRat = self.authorUser.comment_set.all().aggregate(commentRating=Sum('rating'))
+        if postRat.get('postRating') is not None:
+            pRat += postRat.get('postRating')
+
+        commentRat = self.autorUser.comment_set.all().aggregate(commentRating=Sum('rating'))
         cRat = 0
-        cRat += commentRat.get('commentRating')
+
+        if commentRat.get('commentRating') is not None:
+            cRat += commentRat.get('commentRating')
 
         self.ratingAuthor = pRat * 3 + cRat
         self.save()
